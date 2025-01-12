@@ -3,7 +3,6 @@ from django.shortcuts import render
 from blog.models import Post
 from django.http import HttpResponse
 
-
 from blog.models import Post
 
 def blog_index(request):
