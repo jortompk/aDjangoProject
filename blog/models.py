@@ -76,7 +76,32 @@ class Post(models.Model):
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField("Tag", related_name="posts")
-
+    tags = models.CharField(null=True, blank=True, max_length=300)
+    tag = models.ForeignKey(Tag, null=True, blank=True, on_delete=models.CASCADE)
+    uniqueId = models.CharField(null=True, blank=True, max_length=100)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
+    #    tags = models.ManyToManyField("Tag", related_name="posts")
+    '''
     def __str__(self):
         return self.title
+    
+        description = models.TextField(null=True, blank=True)'''
+
+
+    def __str__(self):
+        return '{} {}'.format(self.category.title, self.uniqueId)
+
+    def get_absolute_url(self):
+        return reverse('image-detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if self.date_created is None:
+            self.date_created = timezone.localtime(timezone.now())
+        if self.uniqueId is None:
+            self.uniqueId = str(uuid4()).split('-')[4]
+            self.slug = slugify('{} {}'.format(self.tag.title, self.uniqueId))
+
+
+        self.slug = slugify('{} {}'.format(self.tag.title, self.uniqueId))
+        self.last_updated = timezone.localtime(timezone.now())
+        super(Image, self).save(*args, **kwargs)
